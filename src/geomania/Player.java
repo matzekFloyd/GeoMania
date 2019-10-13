@@ -6,11 +6,11 @@
 package geomania;
 
 import java.util.ArrayList;
+
 import processing.core.PVector;
 import processing.core.*;
 
 /**
- *
  * @author Floyd
  */
 public class Player extends BasicStuff {
@@ -19,7 +19,7 @@ public class Player extends BasicStuff {
     UserInterface gui;
 
     Player(PApplet p, float x, float y, UserInterface gui) {
-        super(p);   //FÜHRT KONSTRUKTOR DER ÜBERGEORDNETEN KLASSE AUS
+        super(p);
         this.x = x;
         this.y = y;
         this.width = 30;
@@ -44,7 +44,7 @@ public class Player extends BasicStuff {
         float timeFromShot = currentTime - timeAtLastShot;
         if (timeFromShot > 0.5) {
             timeAtLastShot = currentTime;
-            adds.add(new Shot(p, x + width / 2, y + height / 2, direction,gui));        //x + width / 2, y + height / 2 drücken aus wo Shot starten soll. Direction drückt aus wo nächstes x,y sein werden.
+            adds.add(new Shot(p, x + width / 2, y + height / 2, direction, gui));
         }
     }
 
@@ -52,19 +52,19 @@ public class Player extends BasicStuff {
     public void updatePosition() {
 
         speed.add(acceleration);
-        acceleration.mult(0.5f);                                                //Halbiert Beschleunigung.
-        speed.mult((float) 0.9);                                                //Verringert Geschwindigkeit.
+        acceleration.mult(0.5f);
+        speed.mult((float) 0.9);
 
-        if (speed.mag() >= 10) {                                                //Setzt Maximalgröße des Speed-Vectors auf 10.
+        if (speed.mag() >= 10) {
             speed.setMag(10);
         }
         checkOutOfBounds();
-        x = x + speed.x;                                                        //Addiert x-Wert von speed-Vector dazu. (Pvector besteht aus 2 Variablen)
-        y = y + speed.y;                                                        //Addiert y-Wert von speed-Vector dazu. (Pvector besteht aus 2 Variablen)
+        x = x + speed.x;
+        y = y + speed.y;
     }
 
     public void checkOutOfBounds() {
-        if (x + width + speed.x > p.width) {                                    //WENN X/Y GRößER ALS FENSTER DES SPIELS DANN VORZEICHEN DER JEWEILIGEN KOORDINATE UMDREHEN, DAMIT NICHT RAUSFLIEGT.
+        if (x + width + speed.x > p.width) {
             speed.x = speed.x * -1;
         }
         if (y + height + speed.y > p.height) {
@@ -82,6 +82,6 @@ public class Player extends BasicStuff {
     public void handleCollision(BasicStuff other, ArrayList<BasicStuff> stuff) {
         if (other instanceof Enemy) {
             this.dead = true;
-        }  
+        }
     }
 }

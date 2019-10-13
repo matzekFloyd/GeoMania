@@ -9,20 +9,19 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 /**
- *
  * @author Floyd
  */
 public class ImageDisplayer extends BasicStuff {
-    
+
     PImage backgroundImg;
-    
+
     public ImageDisplayer(PApplet p) {
         super(p);
         backgroundImg = p.loadImage("geometry.jpg");
     }
-    
+
     @Override
-    public void draw(){
-        p.image(backgroundImg,0,0);
+    public void draw() {
+        p.image(backgroundImg, 0, 0);
     }
 }

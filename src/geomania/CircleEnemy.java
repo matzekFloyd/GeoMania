@@ -1,23 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package geomania;
 
 import java.util.ArrayList;
+
 import processing.core.PApplet;
 import processing.core.PVector;
 
 /**
- *
  * @author Floyd
  */
 public class CircleEnemy extends Enemy {
 
     CircleEnemy(PApplet p, float x, float y, PVector speed, int level) {
         super(p, x, y, speed, level);
-        //HIER MUSS KEIN this.x = x, da ja super() den KONSTRUKTOR von Enemy ausführt, in dem das bereits geschehen ist.
         width = 50;
         height = 50;
     }
@@ -25,11 +19,11 @@ public class CircleEnemy extends Enemy {
     @Override
     public void draw() {
         p.fill(0, 255, 0);
-        p.ellipse(x + width / 2, y + height / 2, width, height);                // DURCH GLEICHUNG REPRÄSENTIERT X/Y DER ELLIPSE DIE LINKE OBERE ECKE -> EINHEITLICH MIT TRIANGLE UND RECTANGLE. OPTIMAL FÜR COLLISION ABFRAGE
+        p.ellipse(x + width / 2, y + height / 2, width, height);
     }
 
     @Override
-    public void handleCollision(BasicStuff other, ArrayList<BasicStuff> adds) {                     //CODE FÜRS ZUSAMMENFÜGEN DER JEWEILIGEN ENEMIES
+    public void handleCollision(BasicStuff other, ArrayList<BasicStuff> adds) {
         if (other instanceof CircleEnemy) {
             Enemy otherEnemy = (Enemy) other;
             if (!this.dead) {

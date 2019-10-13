@@ -6,11 +6,11 @@
 package geomania;
 
 import java.util.ArrayList;
+
 import processing.core.PApplet;
 import processing.core.PVector;
 
 /**
- *
  * @author Floyd
  */
 public class Enemy extends BasicStuff {
@@ -36,13 +36,13 @@ public class Enemy extends BasicStuff {
             speed.setMag(10);
         }
 
-        x = x + speed.x;                                                        // ADDIERT NUR X WERT VON PVECTOR DAZU; PVECTOR IN WAHRHEIT ZWEI VARIABLEN
+        x = x + speed.x;
         y = y + speed.y;
 
     }
 
     public void checkOutOfBounds() {
-        if (x + width + speed.x > p.width) {      //WENN X/Y GRößER ALS FENSTER DES SPIELS DANN VORZEICHEN DER JEWEILIGEN KOORDINATE UMDREHEN, DAMIT NICHT RAUSFLIEGT.
+        if (x + width + speed.x > p.width) {
             speed.x = speed.x * -1;
         }
         if (y + height + speed.y > p.height) {
@@ -58,7 +58,7 @@ public class Enemy extends BasicStuff {
 
     @Override
     public void handleCollision(BasicStuff other, ArrayList<BasicStuff> stuff) {
-        if (other instanceof Enemy) {                                           //INSTANCEOF CHECKT OB DING(HIER OTHER) VON DER KLASSE(HIER ENEMY) IST
+        if (other instanceof Enemy) {
             other.dead = true;
         }
     }

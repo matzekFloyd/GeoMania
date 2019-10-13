@@ -6,11 +6,11 @@
 package geomania;
 
 import java.util.ArrayList;
+
 import processing.core.PApplet;
 import processing.core.PVector;
 
 /**
- *
  * @author Floyd
  */
 public class BasicStuff {
@@ -23,27 +23,26 @@ public class BasicStuff {
     float y;
     float width;
     float height;
-    
+
     public boolean dead = false;
 
     BasicStuff(PApplet p) {
         this.p = p;
     }
-        
-    public void draw() {                                                        //Platzhalter: Klassen die von Basicstuff erben, werden eine draw-Methode haben.
-                                                                                //Tun dann selber, was in ihrer jeweiligen Drawmethode steht. Überschreibt die BasicStuff-Draw
+
+    public void draw() {
     }
 
-    public void updatePosition(){
-    
+    public void updatePosition() {
+
     }
 
     public void stop() {
-        acceleration = new PVector(0, 0);                                       //Setzt PVector auf 0. Damit -> Speed = 0.
+        acceleration = new PVector(0, 0);
     }
 
     public void accelerate(PVector accelerate) {
-        this.acceleration.add(accelerate);                                      //Fügt dem PVector acceleration neuen PVector hinzu. -> Beschleunigung.
+        this.acceleration.add(accelerate);
     }
 
     public boolean touches(BasicStuff other) {
@@ -55,9 +54,9 @@ public class BasicStuff {
         }
         return false;
     }
-    
-    public void handleCollision(BasicStuff other, ArrayList<BasicStuff> stuff){
+
+    public void handleCollision(BasicStuff other, ArrayList<BasicStuff> stuff) {
 
     }
-    
+
 }

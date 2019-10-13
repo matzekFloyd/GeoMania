@@ -6,11 +6,11 @@
 package geomania;
 
 import java.util.ArrayList;
+
 import processing.core.PApplet;
 import processing.core.PVector;
 
 /**
- *
  * @author Floyd
  */
 public class TriangleEnemy extends Enemy {
@@ -28,9 +28,9 @@ public class TriangleEnemy extends Enemy {
     }
 
     @Override
-    public void handleCollision(BasicStuff other, ArrayList<BasicStuff> adds) { //CODE FÜRS ZUSAMMENFÜGEN DER JEWEILIGEN ENEMIES
-        if (other instanceof TriangleEnemy) {                                   //Fragt ab of other das reinkommt, teil von TriangleEnemy ist (also muss es ein TriangleEnemy sein, da keine Klasse existiert die von TriangleEnemy erbt). Wenn ja -> nächste Zeile
-            TriangleEnemy otherEnemy = (TriangleEnemy) other;                   //Mach das other das reingekommen ist fix zu einem TriangleEnemy. (Laufendes Programm weiß das an diesem Punkt nicht fix, deswegen der cast)
+    public void handleCollision(BasicStuff other, ArrayList<BasicStuff> adds) {
+        if (other instanceof TriangleEnemy) {
+            TriangleEnemy otherEnemy = (TriangleEnemy) other;
             if (!this.dead) {
                 if (this.level == otherEnemy.level && this.level < 2) {
                     this.dead = true;

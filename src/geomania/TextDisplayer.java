@@ -8,17 +8,16 @@ package geomania;
 import processing.core.PApplet;
 
 /**
- *
  * @author Floyd
  */
-public class TextDisplayer extends BasicStuff{
-    
+public class TextDisplayer extends BasicStuff {
+
     String text;
     float textSize;
     float textX;
     float textY;
     float textColor;
-    
+
     public TextDisplayer(PApplet p, String text, float textSize, float textX, float textY, float textColor) {
         super(p);
         this.text = text;
@@ -26,12 +25,12 @@ public class TextDisplayer extends BasicStuff{
         this.textX = textX;
         this.textY = textY;
         this.textColor = textColor;
-            }
-    
-    public void draw(){
+    }
+
+    public void draw() {
         p.fill(textColor);
         p.textSize(textSize);
-        p.text(text,textX,textY);
+        p.text(text, textX, textY);
     }
-    
+
 }

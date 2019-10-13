@@ -6,17 +6,17 @@
 package geomania;
 
 import java.util.ArrayList;
+
 import processing.core.PApplet;
 import processing.core.PVector;
 
 /**
- *
  * @author Floyd
  */
 public class SquareEnemy extends Enemy {
 
     SquareEnemy(PApplet p, float x, float y, PVector speed, int level) {
-        super(p, x, y, speed, level);       //Führt Konstruktor der Parent-Klasse aus. Hier nix anderes als "this.x = x, this.speed = speed"
+        super(p, x, y, speed, level);
         width = 50;
         height = 50;
     }
@@ -28,7 +28,7 @@ public class SquareEnemy extends Enemy {
     }
 
     @Override
-    public void handleCollision(BasicStuff other, ArrayList<BasicStuff> adds) { //CODE FÜRS ZUSAMMENFÜGEN DER JEWEILIGEN ENEMIES
+    public void handleCollision(BasicStuff other, ArrayList<BasicStuff> adds) {
         if (other instanceof SquareEnemy) {
             Enemy otherEnemy = (Enemy) other;
             if (!this.dead) {

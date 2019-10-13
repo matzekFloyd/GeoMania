@@ -8,7 +8,6 @@ package geomania;
 import processing.core.PApplet;
 
 /**
- *
  * @author Floyd
  */
 public class UserInterface extends BasicStuff {
@@ -16,7 +15,7 @@ public class UserInterface extends BasicStuff {
     int currentTime;
     int startTime;
     int score = 0;
-    boolean counting = true;                                                    //Wenn true -> timer zählt nach oben.
+    boolean counting = true;
 
     public UserInterface(PApplet p) {
         super(p);
@@ -39,22 +38,22 @@ public class UserInterface extends BasicStuff {
 
     public void showTime() {
         if (counting) {
-            startTime = p.millis() / 1000 - currentTime;   
+            startTime = p.millis() / 1000 - currentTime;
         }
         p.fill(255);
         p.textSize(20);
         p.text("Time" + " : " + startTime, 650, 50);
     }
 
-    public void stopTime(){
+    public void stopTime() {
         counting = false;
     }
-    
+
     public void resetTime() {
         counting = true;
         currentTime = p.millis() / 1000;
     }
-    
+
     public void resetScore() {
         score = 0;
     }
