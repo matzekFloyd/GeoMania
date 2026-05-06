@@ -130,6 +130,76 @@ const enemyRandomizer = () => 0.5 + Math.random();
 const points = (level: number) => [125, 100, 75, 50, 25][level] ?? 0;
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
+/** Inset from canvas edges: D-pad bottom/right and HUD bottom/left stay aligned. */
+const EDGE_MARGIN = 24;
+
+/** On-screen D-pad in sketch coordinates (800×800). Bottom-right cross layout. */
+const PAD = (() => {
+  const btn = 52;
+  const gap = 8;
+  const cx = 800 - EDGE_MARGIN - gap - btn;
+  const cy = 800 - EDGE_MARGIN - gap - btn;
+  const up = { x: cx - btn / 2, y: cy - btn - gap, w: btn, h: btn };
+  const down = { x: cx - btn / 2, y: cy + gap, w: btn, h: btn };
+  const left = { x: cx - btn - gap, y: cy - btn / 2, w: btn, h: btn };
+  const right = { x: cx + gap, y: cy - btn / 2, w: btn, h: btn };
+  return { btn, gap, cx, cy, up, down, left, right };
+})();
+
+const HUD_BOTTOM_BASELINE = 800 - EDGE_MARGIN;
+const HUD_LEVEL_BASELINE = HUD_BOTTOM_BASELINE - 22;
+const HUD_LEFT = EDGE_MARGIN;
+
+const pointInRect = (px: number, py: number, rx: number, ry: number, rw: number, rh: number) =>
+  px >= rx && px <= rx + rw && py >= ry && py <= ry + rh;
+
+const readPadFromPoint = (
+  px: number,
+  py: number,
+  out: { up: boolean; down: boolean; left: boolean; right: boolean }
+) => {
+  if (pointInRect(px, py, PAD.up.x, PAD.up.y, PAD.up.w, PAD.up.h)) out.up = true;
+  if (pointInRect(px, py, PAD.down.x, PAD.down.y, PAD.down.w, PAD.down.h)) out.down = true;
+  if (pointInRect(px, py, PAD.left.x, PAD.left.y, PAD.left.w, PAD.left.h)) out.left = true;
+  if (pointInRect(px, py, PAD.right.x, PAD.right.y, PAD.right.w, PAD.right.h)) out.right = true;
+};
+
+const readOnScreenPad = (p: p5) => {
+  const pad = { up: false, down: false, left: false, right: false };
+  for (let i = 0; i < p.touches.length; i += 1) {
+    const t = p.touches[i] as { x: number; y: number };
+    readPadFromPoint(t.x, t.y, pad);
+  }
+  if (p.mouseIsPressed && p.mouseButton === p.LEFT) {
+    readPadFromPoint(p.mouseX, p.mouseY, pad);
+  }
+  return pad;
+};
+
+const DEAD_TOUCH = {
+  retry: { x: 150, y: 500, w: 500, h: 52 },
+  menu: { x: 150, y: 565, w: 500, h: 52 },
+};
+
+const drawDirectionalPad = (p: p5, active: { up: boolean; down: boolean; left: boolean; right: boolean }) => {
+  const drawBtn = (r: { x: number; y: number; w: number; h: number }, isOn: boolean, label: string) => {
+    p.fill(isOn ? 80 : 40, isOn ? 80 : 40, isOn ? 80 : 40, 200);
+    p.stroke(220);
+    p.strokeWeight(2);
+    p.rect(r.x, r.y, r.w, r.h, 8);
+    p.noStroke();
+    p.fill(255);
+    p.textSize(22);
+    p.textAlign(p.CENTER, p.CENTER);
+    p.text(label, r.x + r.w / 2, r.y + r.h / 2 + 1);
+    p.textAlign(p.LEFT, p.BASELINE);
+  };
+  drawBtn(PAD.up, active.up, "↑");
+  drawBtn(PAD.down, active.down, "↓");
+  drawBtn(PAD.left, active.left, "←");
+  drawBtn(PAD.right, active.right, "→");
+};
+
 export const mountGeoMania = (mountElement: HTMLElement): void => {
   let gameStartTime = 0;
   let frozenTime = 0;
@@ -249,7 +319,28 @@ export const mountGeoMania = (mountElement: HTMLElement): void => {
       fitCanvasToViewport();
     };
 
+    p.touchStarted = () => {
+      if (currentLevel === 0) {
+        startGame(p);
+        return false;
+      }
+      if (player.dead && currentLevel > 0 && currentLevel < 4) {
+        if (pointInRect(p.mouseX, p.mouseY, DEAD_TOUCH.retry.x, DEAD_TOUCH.retry.y, DEAD_TOUCH.retry.w, DEAD_TOUCH.retry.h)) {
+          gameStartTime = p.millis() / 1000;
+          score = 0;
+          resetLevel();
+        } else if (pointInRect(p.mouseX, p.mouseY, DEAD_TOUCH.menu.x, DEAD_TOUCH.menu.y, DEAD_TOUCH.menu.w, DEAD_TOUCH.menu.h)) {
+          fullRestart();
+        }
+      }
+      return false;
+    };
+
+    p.touchMoved = () => false;
+
     p.keyPressed = () => {
+      const wasTitleScreen = currentLevel === 0;
+
       if (p.key === " ") {
         if (currentLevel > 0 && currentLevel < 4) {
           currentLevel += 1;
@@ -261,11 +352,11 @@ export const mountGeoMania = (mountElement: HTMLElement): void => {
         }
       }
 
-      if (currentLevel === 0) {
+      if (wasTitleScreen) {
         startGame(p);
       }
 
-      if (p.key === "s" || p.key === "S") {
+      if ((p.key === "t" || p.key === "T") && !wasTitleScreen && currentLevel > 0 && currentLevel < 4) {
         gameStartTime = p.millis() / 1000;
         score = 0;
         resetLevel();
@@ -329,10 +420,11 @@ export const mountGeoMania = (mountElement: HTMLElement): void => {
         }
       }
 
-      const upDown = p.keyIsDown(p.UP_ARROW);
-      const downDown = p.keyIsDown(p.DOWN_ARROW);
-      const rightDown = p.keyIsDown(p.RIGHT_ARROW);
-      const leftDown = p.keyIsDown(p.LEFT_ARROW);
+      const pad = readOnScreenPad(p);
+      const upDown = p.keyIsDown(p.UP_ARROW) || p.keyIsDown(87) || pad.up;
+      const downDown = p.keyIsDown(p.DOWN_ARROW) || p.keyIsDown(83) || pad.down;
+      const rightDown = p.keyIsDown(p.RIGHT_ARROW) || p.keyIsDown(68) || pad.right;
+      const leftDown = p.keyIsDown(p.LEFT_ARROW) || p.keyIsDown(65) || pad.left;
 
       const acceleration = { x: 0, y: 0 };
       if (upDown) {
@@ -441,8 +533,11 @@ export const mountGeoMania = (mountElement: HTMLElement): void => {
       p.textSize(20);
       p.text(`Score : ${score}`, 50, 50);
       p.text(`Time : ${Math.floor(now - gameStartTime)}`, 650, 50);
-      p.text(`Level ${currentLevel}`, 50, 750);
-      p.text("restart: 'r' = game, 's' = level", 463, 750);
+      p.textSize(18);
+      p.text(`Level ${currentLevel}`, HUD_LEFT, HUD_LEVEL_BASELINE);
+      p.textSize(14);
+      p.text("restart: 'r' = game, 't' = level", HUD_LEFT, HUD_BOTTOM_BASELINE);
+      p.textSize(20);
 
       if (!player.dead) {
         p.fill(155);
@@ -458,8 +553,20 @@ export const mountGeoMania = (mountElement: HTMLElement): void => {
         p.textSize(48);
         p.text("You Died", 300, 360);
         p.textSize(26);
-        p.text("Press S to restart level", 265, 420);
+        p.text("Press T to restart level", 265, 420);
         p.text("or R for full restart", 290, 460);
+        p.fill(50, 120, 70, 230);
+        p.rect(DEAD_TOUCH.retry.x, DEAD_TOUCH.retry.y, DEAD_TOUCH.retry.w, DEAD_TOUCH.retry.h, 10);
+        p.fill(120, 60, 60, 230);
+        p.rect(DEAD_TOUCH.menu.x, DEAD_TOUCH.menu.y, DEAD_TOUCH.menu.w, DEAD_TOUCH.menu.h, 10);
+        p.fill(255);
+        p.textSize(22);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text("Tap: restart level", DEAD_TOUCH.retry.x + DEAD_TOUCH.retry.w / 2, DEAD_TOUCH.retry.y + DEAD_TOUCH.retry.h / 2);
+        p.text("Tap: back to title", DEAD_TOUCH.menu.x + DEAD_TOUCH.menu.w / 2, DEAD_TOUCH.menu.y + DEAD_TOUCH.menu.h / 2);
+        p.textAlign(p.LEFT, p.BASELINE);
+      } else {
+        drawDirectionalPad(p, pad);
       }
     };
   };

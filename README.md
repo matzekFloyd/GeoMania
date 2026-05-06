@@ -90,6 +90,8 @@ npm run build
 
 The static output is written to `web/dist/` and can be hosted on any static host.
 
+**Controls (browser):** Arrow keys or `W` `A` `S` `D` to move and shoot; on-screen D-pad on touch devices; `P` pause; `T` restart current level; `R` full restart to title; `Space` skip level.
+
 ## Release Artifacts
 
 For the planned `v1.0.0` release, the repository will stay source-focused (no third-party jars committed).
