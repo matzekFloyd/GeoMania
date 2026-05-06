@@ -37,6 +37,7 @@ You control a player in an 800x800 arena, shoot in four directions, and clear en
 
 - `src/geomania/GeoMania.java`: game entry point (`main`)
 - `src/geomania/`: game entities and logic
+- `web/`: browser implementation using p5.js
 - `geometry.jpg`: background image loaded at runtime
 - `nbproject/`: NetBeans project metadata
 
@@ -67,6 +68,27 @@ java -cp ".;build;C:\path\to\core.jar" geomania.GeoMania
 ```
 
 Replace `C:\path\to\core.jar` with your actual Processing `core.jar` location.
+
+## Browser Version (p5.js)
+
+The repository now includes a browser-playable implementation in `web/`.
+
+Run locally:
+
+```powershell
+cd web
+npm install
+npm run dev
+```
+
+Build static files:
+
+```powershell
+cd web
+npm run build
+```
+
+The static output is written to `web/dist/` and can be hosted on any static host.
 
 ## Release Artifacts
 
