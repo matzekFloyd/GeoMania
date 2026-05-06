@@ -224,10 +224,29 @@ export const mountGeoMania = (mountElement: HTMLElement): void => {
   };
 
   const sketch = (p: p5) => {
+    let canvas: p5.Renderer;
+
+    const fitCanvasToViewport = () => {
+      const viewportPadding = 24;
+      const availableWidth = Math.max(window.innerWidth - viewportPadding, 240);
+      const availableHeight = Math.max(window.innerHeight - viewportPadding, 240);
+      const maxScale = Math.min(1, availableWidth / 800, availableHeight / 800);
+      const integerDivisor = Math.max(1, Math.ceil(1 / maxScale));
+      const scale = 1 / integerDivisor;
+      canvas.style("width", `${800 * scale}px`);
+      canvas.style("height", `${800 * scale}px`);
+    };
+
     p.setup = () => {
-      p.createCanvas(800, 800).parent(mountElement);
+      canvas = p.createCanvas(800, 800);
+      canvas.parent(mountElement);
       p.textFont("Arial");
       backgroundImage = p.loadImage("/geometry.jpg");
+      fitCanvasToViewport();
+    };
+
+    p.windowResized = () => {
+      fitCanvasToViewport();
     };
 
     p.keyPressed = () => {
