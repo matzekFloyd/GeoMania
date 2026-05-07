@@ -1,6 +1,7 @@
 name: Web release bundle
 
 # Tag a commit (e.g. git tag v1.0.1 && git push origin v1.0.1) to attach a zip of web/dist to that GitHub Release.
+# Note for release notes/users: extracted bundle must be served via HTTP (not opened via file:// index.html).
 on:
   push:
     tags:

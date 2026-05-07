@@ -92,12 +92,22 @@ The static output is written to `web/dist/` and can be hosted on any static host
 
 **Controls (browser):** Arrow keys or `W` `A` `S` `D` to move and shoot; on-screen D-pad on touch devices; `P` pause; `T` restart current level; `R` full restart to title; `Space` skip level.
 
+When using a downloaded build bundle, do not open `index.html` directly via `file://` (browser module/CORS restrictions). Serve the extracted folder via HTTP instead, for example:
+
+```bash
+# from the extracted dist folder
+python -m http.server 8080
+# or
+npx serve .
+```
+
 ## Releases / CI
 
 GitHub Actions workflows:
 
 - `web-ci.yml`: builds `web/` on relevant pushes/PRs and uploads artifact `geomania-web-dist`.
 - `web-release.yml`: runs on `v*` tags, builds `web/dist`, and attaches `geomania-web-<tag>.zip` to the GitHub Release.
+- Release bundle usage: extract the ZIP and serve it via HTTP (for example `python -m http.server 8080` or `npx serve .`) instead of opening `index.html` with `file://`.
 
 Create a release build:
 
