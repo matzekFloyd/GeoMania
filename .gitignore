@@ -9,3 +9,4 @@ nbdist/
 .idea
 build.xml
 manifest.mf
+web/node_modules/
