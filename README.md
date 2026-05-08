@@ -121,7 +121,7 @@ GeoMania is configured for static deployment on Netlify via `netlify.toml`.
 
 ### Hosted URL
 
-- Production URL: `https://<your-netlify-site>.netlify.app`
+- Production URL: `https://geo-mania.netlify.app/`
 
 ### Local preview of production build
 
