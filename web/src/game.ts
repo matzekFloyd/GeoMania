@@ -132,6 +132,7 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 const WORLD_SIZE = 800;
 const MIN_CANVAS_SCALE = 0.5;
 const MAX_CANVAS_SCALE = 1.75;
+const BACKGROUND_IMAGE_URL = new URL("geometry.jpg", import.meta.env.BASE_URL).toString();
 
 /** Inset from canvas edges: D-pad bottom/right and HUD bottom/left stay aligned. */
 const EDGE_MARGIN = 24;
@@ -317,7 +318,7 @@ export const mountGeoMania = (mountElement: HTMLElement): void => {
       canvas = p.createCanvas(WORLD_SIZE, WORLD_SIZE);
       canvas.parent(mountElement);
       p.textFont("Arial");
-      backgroundImage = p.loadImage("/geometry.jpg", undefined, () => {
+      backgroundImage = p.loadImage(BACKGROUND_IMAGE_URL, undefined, () => {
         backgroundImage = null;
       });
       fitCanvasToViewport();
