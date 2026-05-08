@@ -129,6 +129,9 @@ class Shot extends BasicStuff {
 const enemyRandomizer = () => 0.5 + Math.random();
 const points = (level: number) => [125, 100, 75, 50, 25][level] ?? 0;
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+const WORLD_SIZE = 800;
+const MIN_CANVAS_SCALE = 0.5;
+const MAX_CANVAS_SCALE = 1.75;
 
 /** Inset from canvas edges: D-pad bottom/right and HUD bottom/left stay aligned. */
 const EDGE_MARGIN = 24;
@@ -137,8 +140,8 @@ const EDGE_MARGIN = 24;
 const PAD = (() => {
   const btn = 52;
   const gap = 8;
-  const cx = 800 - EDGE_MARGIN - gap - btn;
-  const cy = 800 - EDGE_MARGIN - gap - btn;
+  const cx = WORLD_SIZE - EDGE_MARGIN - gap - btn;
+  const cy = WORLD_SIZE - EDGE_MARGIN - gap - btn;
   const up = { x: cx - btn / 2, y: cy - btn - gap, w: btn, h: btn };
   const down = { x: cx - btn / 2, y: cy + gap, w: btn, h: btn };
   const left = { x: cx - btn - gap, y: cy - btn / 2, w: btn, h: btn };
@@ -146,7 +149,7 @@ const PAD = (() => {
   return { btn, gap, cx, cy, up, down, left, right };
 })();
 
-const HUD_BOTTOM_BASELINE = 800 - EDGE_MARGIN;
+const HUD_BOTTOM_BASELINE = WORLD_SIZE - EDGE_MARGIN;
 const HUD_LEVEL_BASELINE = HUD_BOTTOM_BASELINE - 22;
 const HUD_LEFT = EDGE_MARGIN;
 
@@ -297,21 +300,26 @@ export const mountGeoMania = (mountElement: HTMLElement): void => {
     let canvas: p5.Renderer;
 
     const fitCanvasToViewport = () => {
-      const viewportPadding = 24;
-      const availableWidth = Math.max(window.innerWidth - viewportPadding, 240);
-      const availableHeight = Math.max(window.innerHeight - viewportPadding, 240);
-      const maxScale = Math.min(1, availableWidth / 800, availableHeight / 800);
-      const integerDivisor = Math.max(1, Math.ceil(1 / maxScale));
-      const scale = 1 / integerDivisor;
-      canvas.style("width", `${800 * scale}px`);
-      canvas.style("height", `${800 * scale}px`);
+      const styles = window.getComputedStyle(mountElement);
+      const horizontalPadding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+      const verticalPadding = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+      const containerWidth = mountElement.clientWidth - horizontalPadding;
+      const containerHeight = mountElement.clientHeight - verticalPadding;
+      const availableWidth = Math.max(containerWidth || window.innerWidth, 240);
+      const availableHeight = Math.max(containerHeight || window.innerHeight, 240);
+      const viewportScale = Math.min(availableWidth / WORLD_SIZE, availableHeight / WORLD_SIZE);
+      const scale = clamp(viewportScale, MIN_CANVAS_SCALE, MAX_CANVAS_SCALE);
+      canvas.style("width", `${WORLD_SIZE * scale}px`);
+      canvas.style("height", `${WORLD_SIZE * scale}px`);
     };
 
     p.setup = () => {
-      canvas = p.createCanvas(800, 800);
+      canvas = p.createCanvas(WORLD_SIZE, WORLD_SIZE);
       canvas.parent(mountElement);
       p.textFont("Arial");
-      backgroundImage = p.loadImage("/geometry.jpg");
+      backgroundImage = p.loadImage("/geometry.jpg", undefined, () => {
+        backgroundImage = null;
+      });
       fitCanvasToViewport();
     };
 
@@ -379,11 +387,8 @@ export const mountGeoMania = (mountElement: HTMLElement): void => {
         return;
       }
 
-      if (backgroundImage) {
-        p.image(backgroundImage, 0, 0, p.width, p.height);
-      } else {
-        p.background(0);
-      }
+      p.background(0);
+      if (backgroundImage) p.image(backgroundImage, 0, 0, p.width, p.height);
 
       if (currentLevel === 0) {
         p.fill(255);
