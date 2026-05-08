@@ -101,6 +101,36 @@ python -m http.server 8080
 npx serve .
 ```
 
+## Hosting on Netlify
+
+GeoMania is configured for static deployment on Netlify via `netlify.toml`.
+
+### One-time Netlify site setup
+
+1. In Netlify, create a new site from your Git repository.
+2. Use these build settings (already mirrored in `netlify.toml`):
+   - Base directory: `web`
+   - Build command: `npm ci && npm run build`
+   - Publish directory: `dist`
+3. Deploy the site.
+
+### Ongoing deploy flow
+
+- Push to your production branch (for example `main`) and Netlify will redeploy automatically.
+- For a release tag, keep using the existing GitHub release process; Netlify deployment remains branch-driven.
+
+### Hosted URL
+
+- Production URL: `https://<your-netlify-site>.netlify.app`
+
+### Local preview of production build
+
+```bash
+cd web
+npm run build
+npx serve dist
+```
+
 ## Releases / CI
 
 GitHub Actions workflows:
