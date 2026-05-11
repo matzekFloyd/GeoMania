@@ -1,5 +1,7 @@
 # GeoMania
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 GeoMania is a small arcade game created during university and now prepared for a first public release.
 
 You control a player in an 800x800 arena, shoot in four directions, and clear enemy waves across multiple levels.
