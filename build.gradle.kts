@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "geomania"
-version = (findProperty("geoVersion") as String?) ?: "1.0.0"
+version = (findProperty("geoVersion") as String?) ?: "1.1.0"
 
 repositories {
     mavenCentral()

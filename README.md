@@ -68,11 +68,11 @@ Run unit tests (JUnit 5):
 .\gradlew.bat test
 ```
 
-Produce a single runnable fat JAR (Shadow), default version `1.0.0`:
+Produce a single runnable fat JAR (Shadow), default version `1.1.0`:
 
 ```powershell
 .\gradlew.bat shadowJar
-java -jar build\libs\GeoMania-1.0.0-all.jar
+java -jar build\libs\GeoMania-1.1.0-all.jar
 ```
 
 Override the version string (for example to match a Git tag `v1.2.3`):
@@ -157,13 +157,13 @@ GitHub Actions workflows:
 - `ci.yml`: on pushes/PRs to `main` or `master` when `web/`, Java sources, or Gradle files change — **web** job (`npm ci` / `npm run build`, artifact `geomania-web-dist`), **desktop** job (`./gradlew build` on Ubuntu and Windows, fat JAR artifact from Windows), plus **dependency-submission** (Temurin 17) for Gradle dependency insights.
 - `release.yml`: runs on `v*` tags, builds `web/dist`, builds `GeoMania-<tag>-all.jar`, and attaches both the web ZIP and the fat JAR to the GitHub Release.
 - Web release bundle usage: extract the ZIP and serve it via HTTP (for example `python -m http.server 8080` or `npx serve .`) instead of opening `index.html` with `file://`.
-- Desktop release: requires a **Java 8+** runtime on the player’s machine; run `java -jar GeoMania-v1.0.0-all.jar` (use the exact filename from the release).
+- Desktop release: requires a **Java 8+** runtime on the player’s machine; run `java -jar GeoMania-v1.1.0-all.jar` (use the exact filename from the release).
 
 Create a release build:
 
 ```bash
-git tag v1.0.1
-git push origin v1.0.1
+git tag v1.1.0
+git push origin v1.1.0
 ```
 
 ## Screenshots

@@ -1,4 +1,4 @@
-# Version tags (e.g. v1.0.1): attach web bundle ZIP and desktop fat JAR to the GitHub Release.
+# Version tags (e.g. v1.1.0): attach web bundle ZIP and desktop fat JAR to the GitHub Release.
 # Note for release notes/users: extracted web bundle must be served via HTTP (not opened via file:// index.html).
 
 name: Release
