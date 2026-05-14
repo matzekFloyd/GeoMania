@@ -154,9 +154,8 @@ npx serve dist
 
 GitHub Actions workflows:
 
-- `web-ci.yml`: builds `web/` on relevant pushes/PRs and uploads artifact `geomania-web-dist`.
-- `gradle.yml`: on pushes/PRs to `main` or `master` (when Java/Gradle paths change), runs `./gradlew build` on **Ubuntu and Windows** (Temurin 8), uploads the fat JAR artifact from Windows, and submits a Gradle dependency graph (Temurin 17) for Dependabot.
-- `web-release.yml`: runs on `v*` tags, builds `web/dist`, builds `GeoMania-<tag>-all.jar`, and attaches both the web ZIP and the fat JAR to the GitHub Release.
+- `ci.yml`: on pushes/PRs to `main` or `master` when `web/`, Java sources, or Gradle files change — **web** job (`npm ci` / `npm run build`, artifact `geomania-web-dist`), **desktop** job (`./gradlew build` on Ubuntu and Windows, fat JAR artifact from Windows), plus **dependency-submission** (Temurin 17) for Gradle dependency insights.
+- `release.yml`: runs on `v*` tags, builds `web/dist`, builds `GeoMania-<tag>-all.jar`, and attaches both the web ZIP and the fat JAR to the GitHub Release.
 - Web release bundle usage: extract the ZIP and serve it via HTTP (for example `python -m http.server 8080` or `npx serve .`) instead of opening `index.html` with `file://`.
 - Desktop release: requires a **Java 8+** runtime on the player’s machine; run `java -jar GeoMania-v1.0.0-all.jar` (use the exact filename from the release).
 

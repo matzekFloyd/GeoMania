@@ -1,13 +1,13 @@
-# Builds the desktop GeoMania Gradle project on Ubuntu and Windows (JDK 8, matches compile toolchain).
-# Uses setup-gradle for dependency caching; dependency-submission enables Dependabot alerts for Gradle deps.
-# See: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+# Unified PR / branch checks: browser build (web/) and desktop Gradle build (Java + tests + fat JAR).
+# Dependency submission runs in parallel for Gradle Dependabot integration.
 
-name: Java CI with Gradle
+name: CI
 
 on:
   push:
     branches: [main, master]
     paths:
+      - "web/**"
       - "src/main/**"
       - "src/test/**"
       - "build.gradle.kts"
@@ -15,10 +15,11 @@ on:
       - "gradle/**"
       - "gradlew"
       - "gradlew.bat"
-      - ".github/workflows/gradle.yml"
+      - ".github/workflows/ci.yml"
   pull_request:
     branches: [main, master]
     paths:
+      - "web/**"
       - "src/main/**"
       - "src/test/**"
       - "build.gradle.kts"
@@ -26,13 +27,36 @@ on:
       - "gradle/**"
       - "gradlew"
       - "gradlew.bat"
-      - ".github/workflows/gradle.yml"
+      - ".github/workflows/ci.yml"
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install and build
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: geomania-web-dist
+          path: web/dist/
+          if-no-files-found: error
+
+  desktop:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
