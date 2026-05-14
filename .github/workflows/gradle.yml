@@ -9,6 +9,7 @@ on:
     branches: [main, master]
     paths:
       - "src/main/**"
+      - "src/test/**"
       - "build.gradle.kts"
       - "settings.gradle.kts"
       - "gradle/**"
@@ -19,6 +20,7 @@ on:
     branches: [main, master]
     paths:
       - "src/main/**"
+      - "src/test/**"
       - "build.gradle.kts"
       - "settings.gradle.kts"
       - "gradle/**"

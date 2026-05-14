@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     implementation("org.processing:core:3.3.7")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 }
 
 java {
@@ -23,6 +24,10 @@ java {
 
 application {
     mainClass.set("geomania.GeoMania")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 tasks.jar {

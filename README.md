@@ -62,6 +62,12 @@ From the repository root:
 .\gradlew.bat run
 ```
 
+Run unit tests (JUnit 5):
+
+```powershell
+.\gradlew.bat test
+```
+
 Produce a single runnable fat JAR (Shadow), default version `1.0.0`:
 
 ```powershell
