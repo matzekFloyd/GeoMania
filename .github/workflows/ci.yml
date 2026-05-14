@@ -1,0 +1,115 @@
+# Unified PR / branch checks: browser build (web/) and desktop Gradle build (Java + tests + fat JAR).
+# Dependency submission runs in parallel for Gradle Dependabot integration.
+
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "web/**"
+      - "src/main/**"
+      - "src/test/**"
+      - "build.gradle.kts"
+      - "settings.gradle.kts"
+      - "gradle/**"
+      - "gradlew"
+      - "gradlew.bat"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "web/**"
+      - "src/main/**"
+      - "src/test/**"
+      - "build.gradle.kts"
+      - "settings.gradle.kts"
+      - "gradle/**"
+      - "gradlew"
+      - "gradlew.bat"
+      - ".github/workflows/ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install and build
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: geomania-web-dist
+          path: web/dist/
+          if-no-files-found: error
+
+  desktop:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: "8"
+          distribution: temurin
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        if: runner.os != 'Windows'
+        run: chmod +x gradlew
+
+      - name: Build with Gradle Wrapper (Unix)
+        if: runner.os != 'Windows'
+        run: ./gradlew build --no-daemon
+
+      - name: Build with Gradle Wrapper (Windows)
+        if: runner.os == 'Windows'
+        run: .\gradlew.bat build --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        if: matrix.os == 'windows-latest'
+        with:
+          name: geomania-desktop-jar
+          path: build/libs/GeoMania-*-all.jar
+          if-no-files-found: error
+
+  dependency-submission:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/dependency-submission@v4

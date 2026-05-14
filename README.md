@@ -16,9 +16,11 @@ You control a player in an 800x800 arena, shoot in four directions, and clear en
 
 ## Tech Stack
 
-- Java 8
-- [Processing core library](https://processing.org/download/) (`core.jar`)
-- NetBeans project structure (`nbproject/`)
+- Java 8 (desktop)
+- [Processing core](https://processing.org/) on the classpath via Maven Central (`org.processing:core:3.3.7`), resolved by Gradle (no manual `core.jar`)
+- Gradle build (`build.gradle.kts`, `gradlew`) with Shadow fat JAR for releases
+- Optional NetBeans metadata (`nbproject/`) for legacy IDE use
+- Browser build: p5.js under `web/`
 
 ## Gameplay
 
@@ -37,39 +39,54 @@ You control a player in an 800x800 arena, shoot in four directions, and clear en
 
 ## Project Structure
 
-- `src/geomania/GeoMania.java`: game entry point (`main`)
-- `src/geomania/`: game entities and logic
-- `web/`: browser implementation using p5.js
-- `geometry.jpg`: background image loaded at runtime
-- `nbproject/`: NetBeans project metadata
+- `src/main/java/geomania/`: desktop game (entry point `geomania.GeoMania`)
+- `src/main/resources/data/geometry.jpg`: background image (bundled in the fat JAR)
+- `web/`: browser implementation (p5.js)
+- `nbproject/`: optional NetBeans metadata (sources point at `src/main/java`)
 
-## Requirements
+## Requirements (desktop)
 
-1. Java JDK 8 (or newer; Java 8 is the original target)
-2. Processing `core.jar` available locally
+1. **JDK 8 or newer** installed (Gradle uses a Java 8 toolchain for compilation). Gradle needs `java` on your `PATH` or **`JAVA_HOME`** pointing at a JDK install (not a bare JRE). If `.\gradlew.bat` prints `JAVA_HOME is not set`, install a JDK and open a **new** terminal.
 
-> Note: This repository does not include `core.jar`, so you need to provide it yourself.
+   **Windows (winget):** `winget install -e --id EclipseAdoptium.Temurin.8.JDK`  
+   Then open a **new** terminal and run `java -version`. If Gradle still cannot find Java, set `JAVA_HOME` to the JDK folder under `C:\Program Files\Eclipse Adoptium\` (the directory that contains `bin\java.exe`).
 
-## Run in NetBeans (recommended)
+2. Nothing else: Processing is pulled from Maven Central on the first build.
 
-1. Open the project folder in NetBeans.
-2. Download Processing and locate `core.jar`.
-3. Add `core.jar` to project libraries/classpath.
-4. Ensure the main class is `geomania.GeoMania`.
-5. Run the project.
+## Desktop: build and run (Gradle)
 
-## Run from command line
-
-Example (PowerShell):
+From the repository root:
 
 ```powershell
-# from repository root
-New-Item -ItemType Directory -Force build | Out-Null
-javac -cp ".;C:\path\to\core.jar" -d build src\geomania\*.java
-java -cp ".;build;C:\path\to\core.jar" geomania.GeoMania
+# Windows — first run downloads Gradle (wrapper) if needed
+.\gradlew.bat run
 ```
 
-Replace `C:\path\to\core.jar` with your actual Processing `core.jar` location.
+Run unit tests (JUnit 5):
+
+```powershell
+.\gradlew.bat test
+```
+
+Produce a single runnable fat JAR (Shadow), default version `1.0.0`:
+
+```powershell
+.\gradlew.bat shadowJar
+java -jar build\libs\GeoMania-1.0.0-all.jar
+```
+
+Override the version string (for example to match a Git tag `v1.2.3`):
+
+```powershell
+.\gradlew.bat shadowJar -PgeoVersion=v1.2.3
+java -jar build\libs\GeoMania-v1.2.3-all.jar
+```
+
+On Linux or macOS, use `./gradlew` instead of `.\gradlew.bat`.
+
+## Run in NetBeans (optional)
+
+Sources and resources follow the Gradle layout under `src/main/java` and `src/main/resources`. You still need `core.jar` on the classpath when opening as a plain Ant-based NetBeans project unless you use NetBeans’ Gradle integration and open this repo as a Gradle project.
 
 ## Browser Version (p5.js)
 
@@ -137,9 +154,10 @@ npx serve dist
 
 GitHub Actions workflows:
 
-- `web-ci.yml`: builds `web/` on relevant pushes/PRs and uploads artifact `geomania-web-dist`.
-- `web-release.yml`: runs on `v*` tags, builds `web/dist`, and attaches `geomania-web-<tag>.zip` to the GitHub Release.
-- Release bundle usage: extract the ZIP and serve it via HTTP (for example `python -m http.server 8080` or `npx serve .`) instead of opening `index.html` with `file://`.
+- `ci.yml`: on pushes/PRs to `main` or `master` when `web/`, Java sources, or Gradle files change — **web** job (`npm ci` / `npm run build`, artifact `geomania-web-dist`), **desktop** job (`./gradlew build` on Ubuntu and Windows, fat JAR artifact from Windows), plus **dependency-submission** (Temurin 17) for Gradle dependency insights.
+- `release.yml`: runs on `v*` tags, builds `web/dist`, builds `GeoMania-<tag>-all.jar`, and attaches both the web ZIP and the fat JAR to the GitHub Release.
+- Web release bundle usage: extract the ZIP and serve it via HTTP (for example `python -m http.server 8080` or `npx serve .`) instead of opening `index.html` with `file://`.
+- Desktop release: requires a **Java 8+** runtime on the player’s machine; run `java -jar GeoMania-v1.0.0-all.jar` (use the exact filename from the release).
 
 Create a release build:
 
@@ -150,20 +168,16 @@ git push origin v1.0.1
 
 ## Screenshots
 
-![GeoMania gameplay background](geometry.jpg)
+![GeoMania gameplay background](web/public/geometry.jpg)
 
 ## Notes
 
-- The game expects `geometry.jpg` in the project root at runtime.
+- The desktop build loads `geometry.jpg` from the classpath (`data/geometry.jpg` inside the JAR). A plain `loadImage("geometry.jpg")` fallback remains for non-JAR runs if the resource is missing.
 - Original source comments may contain a mix of English and German.
-
-## Future Improvements
-
-- Migrate to a build tool (`Maven` or `Gradle`) so Processing dependencies can be resolved automatically instead of manually providing `core.jar`.
 
 ## Release Status
 
-`v1.0.0` ships the original Java/Processing sources and a browser build under `web/` (run `npm run build` to produce `web/dist/` for static hosting).
+Releases ship the browser bundle (`web/`, built with `npm run build`) and the desktop fat JAR from Gradle (`shadowJar`), attached to GitHub Releases on version tags.
 
 ## License
 

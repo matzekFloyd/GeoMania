@@ -45,14 +45,20 @@ public class BasicStuff {
         this.acceleration.add(accelerate);
     }
 
+    /**
+     * Axis-aligned rectangle overlap (same rules as {@link #touches(BasicStuff)}).
+     */
+    public static boolean axisAlignedRectsOverlap(
+            float ax, float ay, float aw, float ah,
+            float bx, float by, float bw, float bh) {
+        return ax < bx + bw
+                && ax + aw > bx
+                && ay < by + bh
+                && ay + ah > by;
+    }
+
     public boolean touches(BasicStuff other) {
-        if (this.x < other.x + other.width
-                && this.x + this.width > other.x
-                && this.y < other.y + other.height
-                && this.height + this.y > other.y) {
-            return true; // collision detected!
-        }
-        return false;
+        return axisAlignedRectsOverlap(x, y, width, height, other.x, other.y, other.width, other.height);
     }
 
     public void handleCollision(BasicStuff other, ArrayList<BasicStuff> stuff) {
