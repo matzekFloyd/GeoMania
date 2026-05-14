@@ -179,6 +179,14 @@ git push origin v1.1.0
 
 Releases ship the browser bundle (`web/`, built with `npm run build`) and the desktop fat JAR from Gradle (`shadowJar`), attached to GitHub Releases on version tags.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Security
+
+See [SECURITY.md](SECURITY.md).
+
 ## License
 
 This project is licensed under the MIT License. See `LICENSE` for details.
